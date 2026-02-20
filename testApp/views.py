@@ -2,7 +2,10 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_POST
 from django.core.paginator import Paginator
 from django.http import JsonResponse
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 from .models import TodoItem
+from .serializers import TodoItemSerializer
 
 def home(request):
     todos_list = TodoItem.objects.all().order_by('-id')
@@ -14,6 +17,18 @@ def home(request):
 def get_description(request, id):
     todo = get_object_or_404(TodoItem, id=id)
     return JsonResponse({'description': todo.description})
+
+@api_view(['GET'])
+def todo_list_api(request):
+    todos = TodoItem.objects.all().order_by('-id')
+    serializer = TodoItemSerializer(todos, many=True)
+    return Response(serializer.data)
+
+@api_view(['GET'])
+def todo_detail_api(request, id):
+    todo = get_object_or_404(TodoItem, id=id)
+    serializer = TodoItemSerializer(todo)
+    return Response(serializer.data)
 
 @require_POST
 def add_todo(request):

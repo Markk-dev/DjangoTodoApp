@@ -37,6 +37,7 @@
                 {% if todo.description %}
                 <div class="todo-description">{{ todo.description }}</div>
                 {% endif %}
+                <div class="todo-date">{{ todo.created_at|date:"M d, Y - g:i A" }}</div>
             </div>
             <div class="todo-menu">
                 <button class="menu-btn" onclick="toggleMenu({{ todo.id }})">⋯</button>

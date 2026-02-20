@@ -9,4 +9,7 @@ urlpatterns = [
     path("delete/<int:id>/", views.delete_todo, name="delete_todo"),
     path("clear/", views.clear_all, name="clear_all"),
     path("get-description/<int:id>/", views.get_description, name="get_description"),
+    
+    path("api/todo/", views.todo_list_api, name="todo_list_api"),
+    path("api/todo/<int:id>/", views.todo_detail_api, name="todo_detail_api"),
 ]
