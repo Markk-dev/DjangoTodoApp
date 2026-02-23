@@ -18,17 +18,38 @@ def get_description(request, id):
     todo = get_object_or_404(TodoItem, id=id)
     return JsonResponse({'description': todo.description})
 
-@api_view(['GET'])
+@api_view(['GET', 'POST'])
 def todo_list_api(request):
-    todos = TodoItem.objects.all().order_by('-id')
-    serializer = TodoItemSerializer(todos, many=True)
-    return Response(serializer.data)
+    if request.method == 'GET':
+        todos = TodoItem.objects.all().order_by('-id')
+        serializer = TodoItemSerializer(todos, many=True)
+        return Response(serializer.data)
+    
+    elif request.method == 'POST':
+        serializer = TodoItemSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=201)
+        return Response(serializer.errors, status=400)
 
-@api_view(['GET'])
+@api_view(['GET', 'PATCH', 'DELETE'])
 def todo_detail_api(request, id):
     todo = get_object_or_404(TodoItem, id=id)
-    serializer = TodoItemSerializer(todo)
-    return Response(serializer.data)
+    
+    if request.method == 'GET':
+        serializer = TodoItemSerializer(todo)
+        return Response(serializer.data)
+    
+    elif request.method == 'PATCH':
+        serializer = TodoItemSerializer(todo, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=400)
+    
+    elif request.method == 'DELETE':
+        todo.delete()
+        return Response(status=204)
 
 @require_POST
 def add_todo(request):
